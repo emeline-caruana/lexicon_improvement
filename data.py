@@ -6,7 +6,7 @@ import torch
 from nltk.corpus import wordnet as wn
 
 ## variables globales
-vocab, vect_dic, embeds_dic = [], {}, {}
+vocab, vect_dict, embeds_dict = [], {}, {}
 
 def read_data(file):
     vectors = {}
@@ -26,18 +26,21 @@ def read_data(file):
                 vectors[l[0]].append(vector)
     return(vectors)
 
-vect_dic = read_data("corpus_retrofitting_algo/datasets/rg65_french.txt")
-#print(vect_dic['corde'])
+vect_dict = read_data("corpus_retrofitting_algo/datasets/rg65_french.txt")
+#print(vect_dict['corde'])
 
-embed_dic = read_data("corpus_retrofitting_algo/word_embeddings/vecs100-linear-frwiki")
-#print("corde : ", embed_dic['corde'])
-#print("la : ", embed_dic['la'])
+embed_dict = read_data("corpus_retrofitting_algo/word_embeddings/vecs100-linear-frwiki")
+#print("corde : ", embed_dict['corde'])
+#print("la : ", embed_dict['la'])
 
 def find_vector(word,dic):
+    ## Fonction qui permet de récupérer le vecteur d'un certain mot
+    ## return [mot 2, value] pour le cas du dictionnaire vect_dict
+    ## return [embeddings] pour le cas du dictionnaire embed_dict
     for key, value in dic.items():
         if word == key:
             return value
     return("Le mot n'a pas été trouvé dans le lexique.")
 
-#print(find_vector("corde", vect_dic))
-#print(find_vector("idk", vect_dic))
+#print(find_vector("corde", vect_dict))
+#print(find_vector("idk", vect_dict))
