@@ -6,10 +6,22 @@ import torch
 from nltk.corpus import wordnet as wn
 
 ## variables globales
-vocab, vect_dict, embeds_dict = [], {}, {}
+vocab, vect_dict, embed_dict = [], {}, {}
 
-def read_data(file):
+def read_data(lang,type='vect'):
     vectors = {}
+
+    if lang == 'fra':
+        if type == 'vect':
+            file = "corpus_retrofitting_algo/datasets/rg65_french.txt"
+        else:
+            file = "corpus_retrofitting_algo/word_embeddings/vecs100-linear-frwiki"
+    else:
+        if type == 'vect':
+            file = "corpus_retrofitting_algo/datasets/ws353.txt"
+        else:
+            file = "corpus_retrofitting_algo/word_embeddings/vecs100-linear-frwiki"
+
     with open(file, encoding='utf-8') as f:
         for line in f:
             l = line.split(" ")
@@ -26,12 +38,13 @@ def read_data(file):
                 vectors[l[0]].append(vector)
     return(vectors)
 
-vect_dict = read_data("corpus_retrofitting_algo/datasets/rg65_french.txt")
+vect_dict = read_data("fra")
 #print(vect_dict['corde'])
 
-embed_dict = read_data("corpus_retrofitting_algo/word_embeddings/vecs100-linear-frwiki")
+embed_dict = read_data("fra","embeds")
 #print("corde : ", embed_dict['corde'])
 #print("la : ", embed_dict['la'])
+print("EMBEDS",len(embed_dict))
 
 def find_vector(word,dic):
     ## Fonction qui permet de récupérer le vecteur d'un certain mot
