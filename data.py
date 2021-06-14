@@ -26,7 +26,7 @@ def read_data(lang,type='vect'):
         if type == 'vect':
             file = "corpus_retrofitting_algo/datasets/ws353.txt"
         else:
-            file = "corpus_retrofitting_algo/word_embeddings/vectors_datatxt_250_sg_w10_i5_c500_gensim_clean"
+            file = "corpus_retrofitting_algo/word_embeddings/vectors_datatxt_250_sg_w10_i5_c500_gensim_clean/vectors_datatxt_250_sg_w10_i5_c500_gensim_clean"
     with open(file, encoding='utf-8') as f:
         for line in f:
             l = line.split(" ")
