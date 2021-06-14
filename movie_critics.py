@@ -7,7 +7,6 @@ import allocine
 import nltk
 nltk.download("movie_reviews") ##corpus anglais de critiques de films
 
-print(len(new_vectors))
 
 """
 Pour l'analyse de sentiments, voir s'il est intéressant de supprimer les stopswords, d'enlever la ponctuation et de tout mettre en minuscule

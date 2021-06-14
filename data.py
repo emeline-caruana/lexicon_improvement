@@ -2,8 +2,8 @@
 # -*- coding: UTF-8 -*-
 
 ## File data.py
-import re
-import torch
+#import re
+#import torch
 import nltk
 from nltk.corpus import wordnet as wn
 
@@ -21,12 +21,12 @@ def read_data(lang,type='vect'):
         if type == 'vect':
             file = "corpus_retrofitting_algo/datasets/rg65_french.txt"
         else:
-            file = "corpus_retrofitting_algo/word_embeddings/vecs100-linear-frwiki"
+            file = "corpus_retrofitting_algo/word_embeddings/vecs100-linear-frwiki/vecs100-linear-frwiki"
     else:
         if type == 'vect':
             file = "corpus_retrofitting_algo/datasets/ws353.txt"
         else:
-            file = "corpus_retrofitting_algo/word_embeddings/vecs100-linear-frwiki"
+            file = "corpus_retrofitting_algo/word_embeddings/vecs100-linear-frwiki/vecs100-linear-frwiki"
     with open(file, encoding='utf-8') as f:
         for line in f:
             l = line.split(" ")
