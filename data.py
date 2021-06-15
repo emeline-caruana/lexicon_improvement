@@ -10,7 +10,7 @@ from nltk.corpus import wordnet as wn
 ## variables globales
 vocab, vect_dict, embed_dict = [], {}, {}
 
-def read_data(lang,type='vect'):
+def read_data(lang,type='embeds'):
     vocab.clear()
     vect_dict.clear()
     embed_dict.clear()
@@ -18,12 +18,12 @@ def read_data(lang,type='vect'):
     vectors = {}
 
     if lang == 'fra':
-        if type == 'vect':
+        if type == 'embeds':
             file = "corpus_retrofitting_algo/datasets/rg65_french.txt"
         else:
             file = "corpus_retrofitting_algo/word_embeddings/vecs100-linear-frwiki/vecs100-linear-frwiki"
     else:
-        if type == 'vect':
+        if type == 'embeds':
             file = "corpus_retrofitting_algo/datasets/ws353.txt"
         else:
             file = "corpus_retrofitting_algo/word_embeddings/vectors_datatxt_250_sg_w10_i5_c500_gensim_clean/vectors_datatxt_250_sg_w10_i5_c500_gensim_clean"
@@ -64,12 +64,12 @@ def read_data(lang,type='vect'):
 
 
 
-vect_dict = read_data("fra")                          ## dictionnaire pour la similarité cosinus
+vect_dict = read_data("fra","vect")                          ## dictionnaire pour la similarité cosinus
 #print(vect_dict['corde'])
 #print(vect_dict)
 print("VECTS",len(vect_dict))
 
-embed_dict = read_data("fra","embeds")                ## dictionnaire pour le retrofitting et la tâche d'analyse de sentiments
+embed_dict = read_data("fra")                ## dictionnaire pour le retrofitting et la tâche d'analyse de sentiments
 #print("corde : ", embed_dict['corde'])
 #print("la : ", embed_dict['la'])
 print("EMBEDS",len(embed_dict))
