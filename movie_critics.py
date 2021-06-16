@@ -1,8 +1,9 @@
-# File movies_critics.py
-try:
-    import allocine
-except ImportError:
-    !pip install allocine-wrapper
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+import allocine
+import regex as re
+import nltk
 nltk.download("movie_reviews") ##corpus anglais de critiques de films
 
 import torch
@@ -19,15 +20,18 @@ import keras.backend as K
 from keras.models import Sequential
 from keras.layers import Dense, Embedding, Lambda
 
-embed_size = len(embed_dict["and"])  ## récupération du nombre de features d'un mot du vocabulaire pour créer la matrice d'embeddings
+from data import *
+from retrofitting import *
 
-def get_data_eng_sentiment(typ):
+embed_size = len(embeddings_dict["and"])  ## récupération du nombre de features d'un mot du vocabulaire pour créer la matrice d'embeddings
+
+def get_data_eng_sentiment(typ="train"):
     if typ == "train" :
-        file = "stanford_raw_train.txt"
+        file = "corpus_retrofitting_algo/datasets/stanford_sentiment_analysis/stanford_raw_train.txt"
     elif typ == "dev":
-        file = "stanford_raw_dev.txt"
+        file = "corpus_retrofitting_algo/datasets/stanford_sentiment_analysis/stanford_raw_dev.txt"
     else:
-        file = "stanford_raw_test.txt"
+        file = "corpus_retrofitting_algo/datasets/stanford_sentiment_analysis/stanford_raw_test.txt"
     critics = []
 
     with open(file, encoding='utf-8') as f:
@@ -74,15 +78,14 @@ def get_embedding_mat(embed_dict,corpus_vocab):
         matrix[i] = vector
     return matrix
 
-embedding_matrix = get_embedding_mat(embed_dict,corpus_vocab)
-
 train_critics_eng, train_corpus_vocab = get_data_eng_sentiment("train")
 X_train, Y_train = fit_data(train_critics_eng)
 
+embedding_matrix = get_embedding_mat(embed_dict,vocabulary)
 
 
 MLP_model = MLPClassifier(hidden_layer_sizes=(100,),activation='tanh',alpha=0.001,solver='adam',max_iter=5000,n_iter_no_change=5)
-MLP_model.fit(X,Y)
+MLP_model.fit(X_train,Y_train)
 
 print("preds : ",MLP_model.predict(X_train))
 print("preds probas: ",MLP_model.predict_proba(X_train))
