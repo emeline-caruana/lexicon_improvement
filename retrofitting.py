@@ -1,85 +1,110 @@
-# File movies_critics.py
-try:
-    import allocine
-except ImportError:
-    !pip install allocine-wrapper
-nltk.download("movie_reviews") ##corpus anglais de critiques de films
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 
-import torch
-import numpy as np
-import sklearn
-from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import accuracy_score
+import nltk
+from nltk.corpus import wordnet as wn
+nltk.download('omw')
+nltk.download('wordnet')  # utilisation de WOLF via NLTK wordnet
 
-from keras import *
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
+from data import vect_dict, embed_dict, vocab
 
-import keras.backend as K
-from keras.models import Sequential
-from keras.layers import Dense, Embedding, Lambda
+def get_synsets(word,lang):
+    ## Méthode pour récupérer tous les mots en relation avec celui donné en argument
+    return wn.synsets(word,lang=lang)
 
-embed_size = len(embed_dict[","])  ## récupération du nombre de features d'un mot du vocabulaire pour créer la matrice d'embeddings
+#print("CHIEN",get_synsets('chien',lang='fra'))
 
-def get_data_eng_sentiment():
-    file = "stanford_raw_train.txt"
-    critics = []
+def lemma(synsets,lang):
+    ## Méthode pour récupérer uniquement les mots des synsets et pas 'word.n.01' par exemple
+    lemmas,list_lemmas = [],[]
+    for synset in synsets:
+      lemmas = synset.lemma_names(lang)
+      for lemma in lemmas:
+        list_lemmas.append(lemma)
+    return list_lemmas
 
-    with open(file, encoding='utf-8') as f:
-        corpus_vocab = []
-        for line in f:
-            ## chaque ligne de type "1 | -1" + "text"
-            #print(line)
-            if re.match(r'\d\s[A-Za-z]+', line):
-                l = line.split(" ")
-                #print(l)
-                sentiment = l[0]
-                text = []
-                for i in range(1,len(l)):
-                    text.append(l[i])
-                    if l[i] not in corpus_vocab :
-                        corpus_vocab.append(l[i])
-                critics.append((sentiment," ".join(text)))
-    return critics,corpus_vocab
+#print("LEMMAS",lemma(get_synsets('chien','fra'),'fra'))
 
-critics_eng, corpus_vocab = get_data_eng_sentiment()
-#print(critics_eng)
+def get_hypernyms(word,lang):
+    ## Méthode pour récupérer tous les mots en relation d'hypernymie avec celui donnée en argument
+    synsets = get_synsets(word,lang=lang)
+    hyp = []
+    if synsets != [] :
+        for synset in synsets:
+            hyp += synset.hypernyms()
+    return hyp
 
-X,Y = [],[]
-for sent,text in critics_eng :
-    X.append(text)
-    Y.append(sent)
+#print("HYPERNYMS",get_hypernyms('chien','fra'))
 
-#print("X\n",X)
-#print("Y\n",len(Y))
+def get_hyponyms(word,lang):
+    ## Méthode pour récupérer tous les mots en relation d'hyponymie avec celui donnée en argument
+    synsets = get_synsets(word,lang=lang)
+    hyp = []
+    if synsets != [] :
+        for synset in synsets:
+            hyp += synset.hyponyms()
+    return hyp
 
-tokenizer = Tokenizer(lower=True,split=' ')
-tokenizer.fit_on_texts(X)
-X = tokenizer.texts_to_sequences(X)
-X = pad_sequences(X)
-print(X)
+#print("HYPONYMS",get_hyponyms('chien','fra'))
 
-def get_embedding_mat(embed_dict,corpus_vocab):
-    ## Fonction de création de matrice d'embeddings
-    matrix = np.zeros((len(corpus_vocab),embed_size))
-    #print(matrix.shape) # (10538, 99)
-    for i,word in enumerate(corpus_vocab):
-        if (word in embed_dict.keys()) and (len(embed_dict[word]) == embed_dim):
-            ## On ne récupère que les vecteurs des mots qui ont la bonne taille et qui font partie du dictionnaire des valeurs pré entrainées
-            vector = embed_dict[word]
-            #print(len(vector))
-        matrix[i] = vector
-    return matrix
+def neighbors(word,lang,rel='neighb',list_neighb=[]):
+    ## Méthode pour récupérer les voisins d'un certain mot en fonction du type de relation donnée en argument ou
+    list_neighb = []
+    # Récupération des synsets avec le type de relation précisé ou non
+    if rel == 'hyponym':
+        synsets = get_hyponyms(word,lang)
+    elif rel == 'hypernym':
+        synsets = get_hypernyms(word,lang)
+    else:
+        synsets = get_synsets(word,lang)
 
-embedding_matrix = get_embedding_mat(embed_dict,corpus_vocab)
+    # Ajout de la liste de tous les mots appartenant au synset à un dictionnaire dont la clé est le mot donné en argument et la valeur est une liste de mots voisins
+    for synset in synsets:
+        if (synset not in list_neighb) or (list_neighb == []):
+            if synset in vocab:
+                list_neighb.append(synset.lemma_names(lang))
+    return list_neighb
 
 
-model = MLPClassifier(hidden_layer_sizes=(100,),activation='tanh',alpha=0.001,solver='adam',max_iter=5000,n_iter_no_change=5)
-model.fit(X,Y)
+#print("NEIGHB",neighbors('chien','fra'))
+#print("NEIGHB HYPONYM",neighbors('chien','fra','hyponym'))
+#print("NEIGHB HYPERNYM",neighbors('chien','fra','hypernym'))
+
+def retrofit(num_iter,vocab,word_dict,lang,relation='neighb'):
+  vocabulary = vocab.intersection(set(word_dict.keys()))
+  vectors_dict = word_dict
+
+  for iter in range(num_iter):
+
+    for word in vocabulary:
+        if word in vectors_dict.keys():
+            word_vect = vectors_dict[word]
+        else : word_vect = []
+
+        list_neighb = neighbors(word,lang,relation)
+        num_neighb = len(list_neighb)
+
+        if list_neighb != []:
+            word_vect = word_dict[word] * num_neighb
+            for neighb in list_neighb:
+                if neighb in vectors_dict.keys():
+                    word_vect += vectors_dict[neighb]
+                    #print("word vect 2",word_vect)
+            vectors_dict[word] = word_vect/(2*num_neighb)
+
+  print("DONE")
+  return vectors_dict
+
 """
-model = Sequential()
-model.add(Embedding(len(corpus_vocab), embed_size, weights=[embedding_matrix])) 
-model.add(Lambda(lambda x: K.mean(x, axis=1), output_shape=(embed_size,)))
-model.add(Dense(2,activation='softmax'))
-model.compile(loss = 'categorical_crossentropy', optimizer='adam',metrics = ['accuracy'])
+BATCH_SIZE = 5
+vocab_list = list(vocab)
+new_vectors = {}
+
+for i in range(5):
+    batch = vocab_list[i:BATCH_SIZE]
+    print(batch)
+    set_batch = set(batch)
+    new_vectors.update(retrofit(5,set_batch,embed_dict,'fra'))
+print("TEST AVANT RETROFIT",batch[0],embed_dict[batch[0]])
+print("TEST APRES RETROFIT",batch[0],new_vectors[batch[0]])
 """
