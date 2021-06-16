@@ -6,24 +6,22 @@ from nltk.corpus import wordnet as wn
 nltk.download('omw')
 nltk.download('wordnet')  # utilisation de WOLF via NLTK wordnet
 
-from data import vect_dict, embed_dict, vocab
+from data import similarity_dict, embeddings_dict, vocabulary
 
 def get_synsets(word,lang):
     ## Méthode pour récupérer tous les mots en relation avec celui donné en argument
     return wn.synsets(word,lang=lang)
 
-#print("CHIEN",get_synsets('chien',lang='fra'))
 
 def lemma(synsets,lang):
     ## Méthode pour récupérer uniquement les mots des synsets et pas 'word.n.01' par exemple
     lemmas,list_lemmas = [],[]
     for synset in synsets:
-      lemmas = synset.lemma_names(lang)
-      for lemma in lemmas:
-        list_lemmas.append(lemma)
+        lemmas = synset.lemma_names(lang)
+        for lemma in lemmas:
+            list_lemmas.append(lemma)
     return list_lemmas
 
-#print("LEMMAS",lemma(get_synsets('chien','fra'),'fra'))
 
 def get_hypernyms(word,lang):
     ## Méthode pour récupérer tous les mots en relation d'hypernymie avec celui donnée en argument
@@ -34,7 +32,6 @@ def get_hypernyms(word,lang):
             hyp += synset.hypernyms()
     return hyp
 
-#print("HYPERNYMS",get_hypernyms('chien','fra'))
 
 def get_hyponyms(word,lang):
     ## Méthode pour récupérer tous les mots en relation d'hyponymie avec celui donnée en argument
@@ -45,7 +42,6 @@ def get_hyponyms(word,lang):
             hyp += synset.hyponyms()
     return hyp
 
-#print("HYPONYMS",get_hyponyms('chien','fra'))
 
 def neighbors(word,lang,rel='neighb',list_neighb=[]):
     ## Méthode pour récupérer les voisins d'un certain mot en fonction du type de relation donnée en argument ou
@@ -66,34 +62,30 @@ def neighbors(word,lang,rel='neighb',list_neighb=[]):
     return list_neighb
 
 
-#print("NEIGHB",neighbors('chien','fra'))
-#print("NEIGHB HYPONYM",neighbors('chien','fra','hyponym'))
-#print("NEIGHB HYPERNYM",neighbors('chien','fra','hypernym'))
-
 def retrofit(num_iter,vocab,word_dict,lang,relation='neighb'):
-  vocabulary = vocab.intersection(set(word_dict.keys()))
-  vectors_dict = word_dict
+    vocabulary = vocab.intersection(set(word_dict.keys()))
+    vectors_dict = word_dict
 
-  for iter in range(num_iter):
+    for iter in range(num_iter):
 
-    for word in vocabulary:
-        if word in vectors_dict.keys():
-            word_vect = vectors_dict[word]
-        else : word_vect = []
+        for word in vocabulary:
+            if word in vectors_dict.keys():
+                word_vect = vectors_dict[word]
+            else : word_vect = []
 
-        list_neighb = neighbors(word,lang,relation)
-        num_neighb = len(list_neighb)
+            list_neighb = neighbors(word,lang,relation)
+            num_neighb = len(list_neighb)
 
-        if list_neighb != []:
-            word_vect = word_dict[word] * num_neighb
-            for neighb in list_neighb:
-                if neighb in vectors_dict.keys():
-                    word_vect += vectors_dict[neighb]
-                    #print("word vect 2",word_vect)
-            vectors_dict[word] = word_vect/(2*num_neighb)
+            if list_neighb != []:
+                word_vect = word_dict[word] * num_neighb
+                for neighb in list_neighb:
+                    if neighb in vectors_dict.keys():
+                        word_vect += vectors_dict[neighb]
+                        #print("word vect 2",word_vect)
+                vectors_dict[word] = word_vect/(2*num_neighb)
 
-  print("DONE")
-  return vectors_dict
+    print("DONE")
+    return vectors_dict
 
 """
 BATCH_SIZE = 5
