@@ -6,7 +6,7 @@ from nltk.corpus import wordnet as wn
 nltk.download('omw')
 nltk.download('wordnet')  # utilisation de WOLF via NLTK wordnet
 
-from data import similarity_dict, embeddings_dict, vocabulary
+#from data import similarity_dict, embeddings_dict, vocabulary
 
 def get_synsets(word,lang):
     ## Méthode pour récupérer tous les mots en relation avec celui donné en argument
@@ -51,6 +51,8 @@ def neighbors(word,lang,rel='neighb',list_neighb=[]):
         synsets = get_hyponyms(word,lang)
     elif rel == 'hypernym':
         synsets = get_hypernyms(word,lang)
+    elif rel == 'synonym':
+        synsets = get_synonyms(word,lang)
     else:
         synsets = get_synsets(word,lang)
 
@@ -63,6 +65,8 @@ def neighbors(word,lang,rel='neighb',list_neighb=[]):
 
 
 def retrofit(num_iter,vocab,word_dict,lang,relation='neighb'):
+    ## Fonction de retrofitting
+    ## D'après l'algorithme de Faruqui
     vocabulary = vocab.intersection(set(word_dict.keys()))
     vectors_dict = word_dict
 
