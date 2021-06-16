@@ -78,20 +78,21 @@ def get_embedding_mat(embed_dict,corpus_vocab):
         matrix[i] = vector
     return matrix
 
-train_critics_eng, train_corpus_vocab = get_data_eng_sentiment("train")
-X_train, Y_train = fit_data(train_critics_eng)
+#train_critics_eng, train_corpus_vocab = get_data_eng_sentiment("train")
+#X_train, Y_train = fit_data(train_critics_eng)
 
-embedding_matrix = get_embedding_mat(embed_dict,vocabulary)
+#embedding_matrix = get_embedding_mat(embed_dict,vocabulary)
 
 
 MLP_model = MLPClassifier(hidden_layer_sizes=(100,),activation='tanh',alpha=0.001,solver='adam',max_iter=5000,n_iter_no_change=5)
-MLP_model.fit(X_train,Y_train)
+#MLP_model.fit(X_train,Y_train)
 
-print("preds : ",MLP_model.predict(X_train))
-print("preds probas: ",MLP_model.predict_proba(X_train))
-print("score : ",MLP_model.score(X_train,Y_train))
-print("accuracy : ",accuracy_score(Y_train,MLP_model.predict(X_train)))
-print("loss : ",MLP_model.loss_)
+def get_info_model(X,Y):
+    print("preds : ",MLP_model.predict(X))
+    print("preds probas: ",MLP_model.predict_proba(X))
+    print("score : ",MLP_model.score(X,Y))
+    print("accuracy : ",accuracy_score(Y,MLP_model.predict()))
+    print("loss : ",MLP_model.loss_)
 """
 model = Sequential()
 model.add(Embedding(len(corpus_vocab), embed_size, weights=[embedding_matrix])) 
