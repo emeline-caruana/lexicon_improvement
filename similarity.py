@@ -73,11 +73,3 @@ def corr_spearman(embed_dict, simil_dict):
   
 sp = corr_spearman(embeddings_dict,similarity_dict)
 print("Corrélation de Spearman :",sp)
-
-def cosine_similarity(embed_dict,simil_dict,word_pairs):
-  new_simil_dict = {}
-  cos_list = []
-  for word1,word2 in word_pairs:
-    if (word1 in embed_dict.keys()) and (word2 in embed_dict.keys()):
-      cos = cosine_similarity(embed_dict[word1],embed_dict[word2])
-    cos_list.append(cos)
