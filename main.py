@@ -35,13 +35,27 @@ if __name__ == "__main__":
 
     # analyse de sentiments avant retrofitting
 
-    train_critics_eng, train_corpus_vocab = get_data_eng_sentiment("train")
-    X_train, Y_train = fit_data(train_critics_eng)
-
     embedding_matrix = get_embedding_mat(embeddings_dict,vocabulary)
+    
+    if args.lang == "eng":
+        train_critics = get_data_eng_sentiment("train")
+        X_train, Y_train = fit_data(train_critics) 
 
-    MLP_model.fit(X_train,Y_train)
+        dev_critics = get_data_eng_sentiment("dev")
+        X_dev, Y_dev = fit_data(dev_critics) 
+    else:
+        train_critics = get_data_fra_sentiment("train")
+        X_train, Y_train = fit_data(train_critics) 
 
+        dev_critics = get_data_fra_sentiment("dev")
+        X_dev, Y_dev= fit_data(dev_critics) 
+
+    
+    MLP_model = MLPClassifier(hidden_layer_sizes=(100,),activation='tanh',alpha=0.001,solver='adam',max_iter=5000,n_iter_no_change=5)
+
+    
+    fit_and_predict(X_train,Y_train)
+    fit_and_predict(X_dev,Y_dev)
     # Retrofitting
 
     new_embeddings_dict = retrofit(1,vocabulary,embeddings_dict,"eng")
@@ -52,10 +66,24 @@ if __name__ == "__main__":
     
     
     # analyse de sentiments après retrofitting
+    embedding_matrix = get_embedding_mat(new_embeddings_dict,vocabulary)
 
-    train_critics_eng, train_corpus_vocab = get_data_eng_sentiment("train")
-    X_train, Y_train = fit_data(train_critics_eng)
+        if args.lang == "eng":
+            train_critics = get_data_eng_sentiment("train")
+            X_train, Y_train = fit_data(train_critics) 
 
-    embedding_matrix = get_embedding_mat(embeddings_dict,vocabulary)
+            dev_critics = get_data_eng_sentiment("dev")
+            X_dev, Y_dev = fit_data(dev_critics) 
+        else:
+            train_critics = get_data_fra_sentiment("train")
+            X_train, Y_train = fit_data(train_critics) 
 
-    MLP_model.fit(X_train,Y_train)
+            dev_critics = get_data_fra_sentiment("dev")
+            X_dev, Y_dev= fit_data(dev_critics) 
+
+
+        MLP_model = MLPClassifier(hidden_layer_sizes=(100,),activation='tanh',alpha=0.001,solver='adam',max_iter=5000,n_iter_no_change=5)
+
+
+        fit_and_predict(X_train,Y_train)
+        fit_and_predict(X_dev,Y_dev)
