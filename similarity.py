@@ -28,14 +28,13 @@ def corr_spearman(embed_dict, simil_dict):
     score_humain = []
 
     paires = [ (mot,simil_dict[mot][0]) for mot in simil_dict.keys() ]
-    liste_mots = []
 
     ## pour chaque paire de mots dont on a les embeddings
     for mot in paires :
 
         if mot[0] in embed_dict and mot[1] in embed_dict :
             ## récupération du score donné par les humains
-            human_score.append(simil_dict[mot][1])
+            score_humain.append(simil_dict[mot][1])
 
             mot1, mot2 = mot[0], mot[1]
             embdg1 = embed_dict[mot1]
