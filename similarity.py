@@ -25,7 +25,7 @@ def indice(liste_sim, autre_liste):
 def paires(embed_dict, simil_dict):
   paires = []
   liste_mots = []
-  
+
   ## pour chaque paire de mots dont on a les embeddings
   for i in simil_dict :
     for j in range(len(simil_dict[i])):
@@ -70,6 +70,6 @@ def corr_spearman(embed_dict, simil_dict):
 
     return spearman
 
-  
-sp = corr_spearman(embeddings_dict,similarity_dict)
-print("Corrélation de Spearman :",sp)
+
+#sp = corr_spearman(embeddings_dict,similarity_dict)
+#print("Corrélation de Spearman :",sp)

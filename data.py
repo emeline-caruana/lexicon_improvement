@@ -15,17 +15,17 @@ def read_data(lang,type='embeds'):
     if lang == 'fra':
         if type != 'embeds':
             similarity_dict.clear()
-            file = "corpus_retrofitting_algo/datasets/rg65_french.txt"
+            file = "/corpus_retrofitting_algo/datasets/rg65_french.txt"
         else:
             embeddings_dict.clear()
-            file = "corpus_retrofitting_algo/word_embeddings/vecs100-linear-frwiki/vecs100-linear-frwiki"
+            file = "/corpus_retrofitting_algo/word_embeddings/vecs100-linear-frwiki/vecs100-linear-frwiki"
     else:
         if type != 'embeds':
             similarity_dict.clear()
-            file = "corpus_retrofitting_algo/datasets/ws353.txt"
+            file = "c/orpus_retrofitting_algo/datasets/ws353.txt"
         else:
             embeddings_dict.clear()
-            file = "corpus_retrofitting_algo/word_embeddings/vectors_datatxt_250_sg_w10_i5_c500_gensim_clean/vectors_datatxt_250_sg_w10_i5_c500_gensim_clean"
+            file = "/corpus_retrofitting_algo/word_embeddings/vectors_datatxt_250_sg_w10_i5_c500_gensim_clean/vectors_datatxt_250_sg_w10_i5_c500_gensim_clean"
     with open(file, encoding='utf-8') as f:
         for line in f:
             l = line.split(" ")
@@ -59,18 +59,6 @@ def read_data(lang,type='embeds'):
     return vectors
 
 
-
-similarity_dict = read_data("fra","vect")                     ## dictionnaire pour la similarité cosinus
-
-#print(vect_dict['corde'])
-#print(similarity_dict)
-#print("VECTS",len(vect_dict))
-
-embeddings_dict = read_data("fra")                            ## dictionnaire pour le retrofitting et la tâche d'analyse de sentiments
-#print("corde : ", embed_dict['corde'])
-#print(embeddings_dict)
-#print("EMBEDS",len(embed_dict))
-
 def find_vector(word,dic):
     ## Fonction qui permet de récupérer le vecteur d'un certain mot
     ## return [mot 2, value] pour le cas du dictionnaire vect_dict
@@ -82,9 +70,21 @@ def find_vector(word,dic):
 
 #print(find_vector("corde", embed_dict))
 #print(find_vector("idk", embed_dict))
+"""
+similarity_dict = read_data("fra","vect")                     ## dictionnaire pour la similarité cosinus
+
+#print(vect_dict['corde'])
+#print(similarity_dict)
+#print("VECTS",len(vect_dict))
+
+embeddings_dict = read_data("fra")                            ## dictionnaire pour le retrofitting et la tâche d'analyse de sentiments
+#print("corde : ", embed_dict['corde'])
+#print(embeddings_dict)
+#print("EMBEDS",len(embed_dict))
+
 
 embed_vocab = [el for el in embeddings_dict.keys()]
 simil_vocab = [el for el in similarity_dict.keys()]
 vocabulary = set(embed_vocab + simil_vocab)
 vocabulary = list(vocabulary)
-print("len vocabulary",len(vocabulary))
+#print("len vocabulary",len(vocabulary))"""

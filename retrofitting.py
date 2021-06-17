@@ -93,7 +93,7 @@ def retrofit(num_iter,vocab,word_dict,lang,relation='neighb'):
     print("DONE")
     return new_word_dict
 
-new_embeddigns_dict = retrofit(1,vocabulary,embeddings_dict,"eng")
+#new_embeddigns_dict = retrofit(1,vocabulary,embeddings_dict,"eng")
 #print("new\n",len(new))
 
 """

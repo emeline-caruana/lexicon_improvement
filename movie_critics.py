@@ -1,10 +1,5 @@
 # File movies_critics.py
 
-try:
-    import allocine
-except ImportError:
-    !pip install allocine-wrapper  ## Pas sûres d'utiliser cette librairie
-
 import re
 import csv
 import torch
