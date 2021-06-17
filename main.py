@@ -49,3 +49,13 @@ if __name__ == "__main__":
     # tâche de similarité après retrofitting
 
     sp = corr_spearman(new_embeddings_dict,similarity_dict)
+    
+    
+    # analyse de sentiments après retrofitting
+
+    train_critics_eng, train_corpus_vocab = get_data_eng_sentiment("train")
+    X_train, Y_train = fit_data(train_critics_eng)
+
+    embedding_matrix = get_embedding_mat(embeddings_dict,vocabulary)
+
+    MLP_model.fit(X_train,Y_train)
