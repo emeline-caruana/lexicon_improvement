@@ -99,12 +99,13 @@ def get_embedding_mat(embed_dict,corpus_vocab):
 embedding_matrix = get_embedding_mat(embeddings_dict,vocabulary)
 
 train_critics_eng = get_data_eng_sentiment("train")
-X_train, Y_train = fit_data(train_critics_eng)
+X_train, Y_train = fit_data(train_critics_eng) 
+
 dev_critics_eng = get_data_eng_sentiment("dev")
-X_dev, Y_dev = fit_data(dev_critics_eng)
+X_dev, Y_dev = fit_data(dev_critics_eng) 
 
 train_critics_fra = get_data_fra_sentiment("train")
-X_train_f, Y_train_f = fit_data(train_critics_fra)
+X_train_f, Y_train_f = fit_data(train_critics_fra) 
 
 # MLP avec sklearn
 MLP_model = MLPClassifier(hidden_layer_sizes=(100,),activation='tanh',alpha=0.001,solver='adam',max_iter=5000,n_iter_no_change=5)
@@ -118,28 +119,25 @@ def fit_and_predict(X,Y):
     print("accuracy : ",accuracy_score(Y,MLP_model.predict(X)))
     print("loss : ",MLP_model.loss_)
 
-#fit_and_predict(X_train,Y_train)
+fit_and_predict(X_train,Y_train)
+fit_and_predict(X_dev,Y_dev)
 
 # MLP avec Keras
 model = Sequential()
 
-def create_model_keras():
-    model.add(Embedding(len(vocabulary), embed_size, weights=[embedding_matrix]))
+def get_model(embedding_matrix, trainable) :
+    model.add(Embedding(len(vocabulary), embed_size, weights=[embedding_matrix], trainable=trainable))
     model.add(Lambda(lambda x: K.mean(x, axis=1), output_shape=(embed_size,len(vocabulary))))
     model.add(Dropout(0.2))
     model.add(Dense(2,activation='softmax'))
-    model.compile(loss = 'categorical_crossentropy', optimizer='adam',metrics = ['accuracy'])
+    model.compile(loss = 'sparse_categorical_crossentropy', optimizer='adam',metrics = ['accuracy'])
+    print(model.summary())
 
-def model_fit(X1,Y1,X2,Y2):
-    create_model_keras()
-    model.fit(X1,Y1, batch_size=35, epochs = 5,  verbose = 5)
-    print(model.predict_on_batch(X2))
-    score,acc = model.evaluate(X2,Y2, verbose=2, batch_size=35)
-    return score,acc
+def train_and_fit(X1,Y1,X2,Y2) : 
+    model.fit(X1, Y2, batch_size=30, epochs = 5,  verbose = 5)
+    score,acc = model.evaluate(X2, Y2, verbose=2, batch_size=30)
+    print("Score : ",score)
+    print("Accuracy : ",acc)
 
-print(np.array(X_train).shape)
-print(np.array(Y_train).shape)
-
-score_dev,acc_dev = model_fit(np.array(X_train),np.array(Y_train),np.array(X_dev),np.array(Y_dev))
-print("Score dev",score_dev)
-print("Accuracy dev",acc_dev)
+get_model(embedding_matrix,True)
+train_and_fit(np.array(X_train),np.array(Y_train),np.array(X_dev),np.array(Y_dev))
