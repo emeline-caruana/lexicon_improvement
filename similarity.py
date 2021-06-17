@@ -41,7 +41,7 @@ def corr_spearman(embed_dict, simil_dict):
             embdg2 = embed_dict[mot2]
 
             ## similarité cosinus
-            score_cos.append(1 - spatial.distance.cosine(embdg_1, embdg_2))
+            cos_score.append(1 - spatial.distance.cosine(embdg_1, embdg_2))
 
         ## On calcule le rang de chaque élément de la liste tout en triant le rang des éléments.
         ## Puisque le coefficient de Spearman calcule le coefficient de corrélation sur les valeurs de rang des données
