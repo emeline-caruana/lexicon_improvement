@@ -14,7 +14,7 @@ def indice(liste_sim, autre_liste):
         print(i)
         print(liste_sim)
         if liste_sim[i] in liste_tri:
-            indice = 1 + list_tri.index(liste_sim[i])
+            indice = 1 + liste_tri.index(liste_sim[i])
             rang.append(indice)
     return rang
 
@@ -49,15 +49,14 @@ def corr_spearman(embed_dict, simil_dict):
         if paires_mots[i][0] in embed_dict and paires_mots[i][1] in embed_dict :
             ## récupération du score donné par les humains
             for j in range(len(simil_dict[paires_mots[i][0]])):
-                if simil_dict[paires_mots[i][0]][j][0] == paires_mots[i][1]
+                if simil_dict[paires_mots[i][0]][j][0] == paires_mots[i][1]:
                     score_humain.append(simil_dict[paires_mots[i][0]][j][1])
-
-            mot1, mot2 = mot[0], mot[1]
-            embdg1 = embed_dict[mot1]
-            embdg2 = embed_dict[mot2]
+            mot1, mot2 = paires_mots[i][0], paires_mots[i][1]
+            embd1 = embed_dict[mot1]
+            embd2 = embed_dict[mot2]
 
             ## similarité cosinus
-            cos_score.append(1 - spatial.distance.cosine(embdg_1, embdg_2))
+            cos_score.append(1 - spatial.distance.cosine(embd1, embd2))
 
         ## On calcule le rang de chaque élément de la liste tout en triant le rang des éléments.
         ## Puisque le coefficient de Spearman calcule le coefficient de corrélation sur les valeurs de rang des données
@@ -65,6 +64,10 @@ def corr_spearman(embed_dict, simil_dict):
         humain_rang = indice(score_humain, score_humain)
 
         ## corrélation de Spearman
-        spearman = spcipy.stats.spearmanr(humain_rang, cos_rang)
+        spearman = np.corrcoef(humain_rang,cos_rang)
+        #spearman = spcipy.stats.spearmanr(humain_rang, cos_rang)
 
         return(spearman)
+
+  
+#print(corr_spearman(embeddings_dict,similarity_dict))
