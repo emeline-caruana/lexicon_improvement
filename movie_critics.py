@@ -1,11 +1,12 @@
-#!/usr/bin/env python
-# -*- coding: UTF-8 -*-
+# File movies_critics.py
 
-import allocine
-import regex as re
-import nltk
-nltk.download("movie_reviews") ##corpus anglais de critiques de films
+try:
+    import allocine
+except ImportError:
+    !pip install allocine-wrapper  ## Pas sûres d'utiliser cette librairie
 
+import re
+import csv
 import torch
 import numpy as np
 import sklearn
@@ -18,10 +19,7 @@ from keras.preprocessing.sequence import pad_sequences
 
 import keras.backend as K
 from keras.models import Sequential
-from keras.layers import Dense, Embedding, Lambda
-
-from data import *
-from retrofitting import *
+from keras.layers import Dense, Embedding, Lambda, LSTM, Dropout, Activation
 
 embed_size = len(embeddings_dict["and"])  ## récupération du nombre de features d'un mot du vocabulaire pour créer la matrice d'embeddings
 
@@ -29,11 +27,11 @@ def get_data_eng_sentiment(typ):
     ## récupération des données pour l'analyse de sentiments en anglais
     ## fichiers de stanford
     if typ == "train" :
-        file = "corpus_retrofitting_algo/datasets/stanford_sentiment_analysis/stanford_raw_train.txt"
+        file = "stanford_raw_train.txt"
     elif typ == "dev":
-        file = "corpus_retrofitting_algo/datasets/stanford_sentiment_analysis/stanford_raw_dev.txt"
+        file = "stanford_raw_dev.txt"
     else:
-        file = "corpus_retrofitting_algo/datasets/stanford_sentiment_analysis/stanford_raw_test.txt"
+        file = "stanford_raw_test.txt"
     critics = []
 
     with open(file, encoding='utf-8') as f:
@@ -54,12 +52,12 @@ def get_data_fra_sentiment(typ="train"):
     ## récupération des données pour l'analyse de sentiments en français
     ## fichiers de allociné, corpus créé par Théophile Blard
     file_table = []
-    if typ == "train":
-        file = "corpus_retrofitting_algo/allocine_reviews/train.csv"
+    if typ == "train" :
+        file = "train.csv"
     elif typ == "dev":
-        file = "corpus_retrofitting_algo/allocine_reviews/valid.csv"
+        file = "valid.csv"
     else:
-        file = "corpus_retrofitting_algo/allocine_reviews/test.csv"
+        file = "test.csv"
     critics = []
 
     with open(file, newline='') as f:
@@ -69,10 +67,12 @@ def get_data_fra_sentiment(typ="train"):
         f.close()
 
     for i in range(len(file_table)):
-        if file_table[2] == 0:
-            file_table[2] = -1
-        critics.append((file_table[1],file_table[2]))
+        critics.append((file_table[i][3],file_table[i][2]))
     return critics
+
+
+i2w = list(vocab)
+w2i = {w: i for i, w in enumerate(i2w)}
 
 
 def fit_data(critics):
@@ -105,7 +105,6 @@ embedding_matrix = get_embedding_mat(embeddings_dict,vocabulary)
 
 train_critics_eng = get_data_eng_sentiment("train")
 X_train, Y_train = fit_data(train_critics_eng)
-
 dev_critics_eng = get_data_eng_sentiment("dev")
 X_dev, Y_dev = fit_data(dev_critics_eng)
 
@@ -124,11 +123,28 @@ def fit_and_predict(X,Y):
     print("accuracy : ",accuracy_score(Y,MLP_model.predict(X)))
     print("loss : ",MLP_model.loss_)
 
-fit_and_predict(X_dev,Y_dev)
+#fit_and_predict(X_train,Y_train)
 
 # MLP avec Keras
 model = Sequential()
-model.add(Embedding(len(vocabulary), embed_size, weights=[embedding_matrix]))
-model.add(Lambda(lambda x: K.mean(x, axis=1), output_shape=(embed_size,)))
-model.add(Dense(2,activation='softmax'))
-model.compile(loss = 'categorical_crossentropy', optimizer='adam')
+
+def create_model_keras():
+    model.add(Embedding(len(vocabulary), embed_size, weights=[embedding_matrix]))
+    model.add(Lambda(lambda x: K.mean(x, axis=1), output_shape=(embed_size,len(vocabulary))))
+    model.add(Dropout(0.2))
+    model.add(Dense(2,activation='softmax'))
+    model.compile(loss = 'categorical_crossentropy', optimizer='adam',metrics = ['accuracy'])
+
+def model_fit(X1,Y1,X2,Y2):
+    create_model_keras()
+    model.fit(X1,Y1, batch_size=35, epochs = 5,  verbose = 5)
+    print(model.predict_on_batch(X2))
+    score,acc = model.evaluate(X2,Y2, verbose=2, batch_size=35)
+    return score,acc
+
+print(np.array(X_train).shape)
+print(np.array(Y_train).shape)
+
+score_dev,acc_dev = model_fit(np.array(X_train),np.array(Y_train),np.array(X_dev),np.array(Y_dev))
+print("Score dev",score_dev)
+print("Accuracy dev",acc_dev)
