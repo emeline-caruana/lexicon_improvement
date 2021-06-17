@@ -11,12 +11,25 @@ def indice(liste_sim, autre_liste):
     rang = []
     liste_tri = sorted(autre_liste)
     for i in range(len(liste_sim)) :
+        print(i)
+        print(liste_sim)
         if liste_sim[i] in liste_tri:
             indice = 1 + list_tri.index(liste_sim[i])
             rang.append(indice)
     return rang
 
-print(indice(similarity_dict,similarity_dict))
+
+def paires(embed_dict, simil_dict):
+  paires = []
+  liste_mots = []
+  
+  ## pour chaque paire de mots dont on a les embeddings
+  for i in simil_dict :
+    for j in range(len(simil_dict[i])):
+      paires.append((i,simil_dict[i][j][0]))
+  return paires
+
+simil_paires = paires(embeddings_dict,similarity_dict)
 
 
 def corr_spearman(embed_dict, simil_dict):
@@ -27,14 +40,17 @@ def corr_spearman(embed_dict, simil_dict):
     cos_score = []
     score_humain = []
 
-    paires = [ (mot,simil_dict[mot][0]) for mot in simil_dict.keys() ]
+    paires_mots = paires(embed_dict, simil_dict)
+    liste_mots = []
 
     ## pour chaque paire de mots dont on a les embeddings
-    for mot in paires :
+    for i in range(len(paires_mots)) :
 
-        if mot[0] in embed_dict and mot[1] in embed_dict :
+        if paires_mots[i][0] in embed_dict and paires_mots[i][1] in embed_dict :
             ## récupération du score donné par les humains
-            score_humain.append(simil_dict[mot][1])
+            for j in range(len(simil_dict[paires_mots[i][0]])):
+                if simil_dict[paires_mots[i][0]][j][0] == paires_mots[i][1]
+                    score_humain.append(simil_dict[paires_mots[i][0]][j][1])
 
             mot1, mot2 = mot[0], mot[1]
             embdg1 = embed_dict[mot1]
