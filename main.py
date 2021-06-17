@@ -9,6 +9,8 @@ import sys
 import argparse
 
 if __name__ == "__main__":
+    print(sys.argv)
+
 
     usage = "Bienvenue dans le projet de retrofitting Juline et Emeline. Avant de commencer, veuillez choisir une langue {'fra'|'eng'}"+sys.argv[0]+" Tout le projet va se faire dans cette langue.\nSi le choix n'est pas fait (ou possible), la langue par défaut est l'anglais."
     parser = argparse.ArgumentParser(usage = usage)

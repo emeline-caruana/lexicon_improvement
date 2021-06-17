@@ -29,11 +29,11 @@ def get_data_eng_sentiment(typ):
     ## récupération des données pour l'analyse de sentiments en anglais
     ## fichiers de stanford
     if typ == "train" :
-        file = "stanford_raw_train.txt"
+        file = "corpus_retrofitting_algo/datasets/stanford_sentiment_analysis/stanford_raw_train.txt"
     elif typ == "dev":
-        file = "stanford_raw_dev.txt"
+        file = "corpus_retrofitting_algo/datasets/stanford_sentiment_analysis/stanford_raw_dev.txt"
     else:
-        file = "stanford_raw_test.txt"
+        file = "corpus_retrofitting_algo/datasets/stanford_sentiment_analysis/stanford_raw_test.txt"
     critics = []
 
     with open(file, encoding='utf-8') as f:
@@ -54,12 +54,12 @@ def get_data_fra_sentiment(typ="train"):
     ## récupération des données pour l'analyse de sentiments en français
     ## fichiers de allociné, corpus créé par Théophile Blard
     file_table = []
-    if typ == "train" :
-        file = "train.csv"
+    if typ == "train":
+        file = "corpus_retrofitting_algo/allocine_reviews/train.csv"
     elif typ == "dev":
-        file = "valid.csv"
+        file = "corpus_retrofitting_algo/allocine_reviews/valid.csv"
     else:
-        file = "test.csv"
+        file = "corpus_retrofitting_algo/allocine_reviews/test.csv"
     critics = []
 
     with open(file, newline='') as f:
