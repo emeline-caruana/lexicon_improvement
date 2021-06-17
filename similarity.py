@@ -1,61 +1,55 @@
 import numpy as np
 import spacy
 from spacy import stats
+from operator import itemgetter, attrgetter
+
+from data import *
+from retrofitting import *
+
+def indice(liste_sim, autre_liste):
+    ## Pour chaque élement de la liste de similarité, on met son indice+1 (= son rang) dans la liste de rang
+    rang = []
+    liste_tri = sorted(autre_liste)
+    for i in range(len(liste_sim)) :
+        if liste_sim[i] in liste_tri:
+            indice = 1 + list_tri.index(liste_sim[i])
+            rang.append(indice)
+    return rang
+
+print(indice(similarity_dict,similarity_dict))
 
 
-
-def indice_similarité(liste_sim, tri) :
-	""" Pour chaque élement de la liste de similarité, on met son indice+1 (= son rang) dans la liste de rang """
-	rang = []
-	for score in liste_sim :
-		index = 1 + tri.index(score)
-		rang.append(index)
-
-	return rang
-    
-def coef_spearman(embeddings, data):
-    """Calcule le coefficient de spearman
-    Entrée :
-        - emdeddings : dictionnaire des embeddings à tester
-        - data : dictionnaire des paires de mots et de leur similarité évaluée par les humains
-    Sortie :
-        coefficient de spearman """
+def corr_spearman(embed_dict, simil_dict):
+    ## Calcule la corrélation de Spearman
 
     cos_rang = []
     humain_rang = []
     cos_score = []
     score_humain = []
-    paires = list(data.keys())
+
+    paires = [ (mot,simil_dict[mot][0]) for mot in simil_dict.keys() ]
     liste_mots = []
 
+    ## pour chaque paire de mots dont on a les embeddings
+    for mot in paires :
 
-    """ Pour chaque paire de mots dont on a les embeddings"""
-    for elt in paires :
-        if elt[0] in embedd and elt[1] in embeddings :
-            """ On récupère le score humain """
-            score_humain.append(data[elt])
+        if mot[0] in embed_dict and mot[1] in embed_dict :
+            ## récupération du score donné par les humains
+            human_score.append(simil_dict[mot][1])
 
-            mot_1, mot_2 = elt[0], elt[1]
-            embdg_1 = embeddings[mot_1]
-            embdg_2 = embeddings[mot_2]
+            mot1, mot2 = mot[0], mot[1]
+            embdg1 = embed_dict[mot1]
+            embdg2 = embed_dict[mot2]
 
-            """ On calcule la similarité cosinus """
-            produit_scalaire = np.dot(embdg_1, embdg_2)
-            norme_1 = np.linalg.norm(embdg_1)
-            norme_2 = np.linalg.norm(embdg_2)
-            cos = produit_scalaire / (norme_1 * norme_2)
-            score_cos.append(cos)
+            ## similarité cosinus
+            score_cos.append(1 - spatial.distance.cosine(embdg_1, embdg_2))
 
-        """ On trie les listes de similarité cos et de évalution humaine """
-        cos_trie = sorted(cos_score, reverse = True)
-        humain_trie = sorted(score_humain, reverse = True)
+        ## On calcule le rang de chaque élément de la liste tout en triant le rang des éléments.
+        ## Puisque le coefficient de Spearman calcule le coefficient de corrélation sur les valeurs de rang des données
+        cos_rang = indice(cos_score, cos_score)
+        humain_rang = indice(score_humain, score_humain)
 
-        """ On calcule le rang de chaque élément de la liste
-        Puisque le coefficient de Spearman calcule le coefficient de corrélation sur les valeurs de rang des données """
-        cos_rang = indice_similarité(cos_score, cos_trie)
-        humain_rang = indice_similarité(score_humain, humain_trie)
-
-        """ On calcule le coefficient de spearman """
-        spearman = scipy.stats.spearmanr(humain_rang, cos_rang)
+        ## corrélation de Spearman
+        spearman = spcipy.stats.spearmanr(humain_rang, cos_rang)
 
         return(spearman)
